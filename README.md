@@ -4,7 +4,7 @@ An **educational, end-to-end machine-learning project** built on historical Powe
 data: real data ingestion, exploratory analysis, statistical testing, Transformer
 training on a Colab GPU, honest backtesting, and publishing to the Hugging Face Hub.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jamelski1/pbml/blob/claude/powerball-prediction-ml-fxhi8i/notebooks/powerball_ml.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jamelski1/PBML/blob/claude/powerball-prediction-ml-fxhi8i/notebooks/powerball_ml.ipynb)
 
 ## ⚠️ The honest part
 

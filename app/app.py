@@ -83,7 +83,7 @@ events; the project's walk-forward backtest shows this Transformer ties with ran
 guessing, exactly as probability theory requires. It exists to demonstrate an
 end-to-end ML workflow: data → EDA → training → honest evaluation → deployment.
 
-[Training notebook & source →](https://github.com/jamelski1/pbml)
+[Training notebook & source →](https://github.com/jamelski1/PBML)
 """
 
 with gr.Blocks(title="Powerball ML") as demo:
