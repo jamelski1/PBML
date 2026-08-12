@@ -121,6 +121,50 @@ def make_features(df, window, extras=()):
 # --------------------------------------------------------------------------- #
 #  Permutation control — the referee
 # --------------------------------------------------------------------------- #
+def physical_bias_test(df):
+    """The correct instrument for the physical-bias hypothesis: a direct
+    frequency test over ALL draws (no windowing, no split -> maximum power).
+
+    A worn/heavy ball shows up as a number appearing more often than 5/69 (white)
+    or 1/26 (Powerball) -- a marginal effect. We run:
+      - a chi-square goodness-of-fit over all numbers, and
+      - a per-number two-sided binomial test, Bonferroni-corrected for the
+        multiple comparisons (testing 69 + 26 numbers inflates false positives).
+
+    Returns a dict with the overall p-values and any numbers whose corrected
+    p < 0.05 (i.e. survive the multiple-comparison correction).
+    """
+    from scipy import stats
+
+    n = len(df)
+    out = {"n_draws": n, "findings": []}
+    for label, cols, k, hi in [("white", WHITE_COLS, 5, N_WHITE),
+                               ("pb", ["pb"], 1, N_PB)]:
+        vals = df[cols].values.ravel()
+        counts = np.bincount(vals, minlength=hi + 1)[1:]  # counts for 1..hi
+        p_each = k / hi                                    # P(number in a draw)
+        expected = n * p_each
+        chi2, p_chi = stats.chisquare(counts)
+        # per-number two-sided binomial, Bonferroni over `hi` tests
+        binom_p = np.array([stats.binomtest(int(c), n, p_each).pvalue
+                            for c in counts])
+        corrected = np.minimum(binom_p * hi, 1.0)
+        survivors = [(i + 1, int(counts[i]), round(float(corrected[i]), 4))
+                     for i in np.argsort(corrected)[:5] if corrected[i] < 0.05]
+        out[label] = {"chi2": round(float(chi2), 2),
+                      "chi2_p": round(float(p_chi), 4),
+                      "expected_per_number": round(float(expected), 1),
+                      "most_extreme": [(int(np.argmax(counts) + 1),
+                                        int(counts.max())),
+                                       (int(np.argmin(counts) + 1),
+                                        int(counts.min()))],
+                      "significant_after_correction": survivors}
+        out["findings"] += [f"{label}: {n}"] if survivors else []
+    out["any_signal"] = bool(out["white"]["significant_after_correction"]
+                             or out["pb"]["significant_after_correction"])
+    return out
+
+
 def permute_targets(y, seed):
     """Destroy the feature->target (past->future) relationship while keeping the
     target's marginal distribution identical. This is our negative control."""

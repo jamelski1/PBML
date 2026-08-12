@@ -76,7 +76,8 @@ class _Transformer(nn.Module):
         nn.init.trunc_normal_(self.pos, std=0.02)
         enc = nn.TransformerEncoderLayer(d_model, nhead, ff, dropout,
                                          batch_first=True, norm_first=True)
-        self.enc = nn.TransformerEncoder(enc, layers)
+        self.enc = nn.TransformerEncoder(enc, layers,
+                                         enable_nested_tensor=False)
         self.norm = nn.LayerNorm(d_model)
         self.head = nn.Linear(d_model, n_out)
 
